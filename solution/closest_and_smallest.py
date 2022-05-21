@@ -102,36 +102,42 @@ See Example tests for the format of the results in your language.
 """
 
 
-def closest(strng: str) -> list:
-    if not strng:
+def closest(string: str) -> list:
+    if not string:
         return []
-    parsed = []
-    for i, item in enumerate(strng.split()):
-        parsed.append(
-            {'number': int(item),
-             'weight': sum(map(int, item)),
-             'index': i}
-        )
+    data = []
+    for i, item in enumerate(string.split()):  # index input data
+        data.append({'number': int(item),
+                     'weight': sum(map(int, item)),
+                     'index': i})
 
-    # parsed = sorted(parsed, key=lambda x: (x['weight'], x['index']))
+    data = sorted(data, key=lambda x: (x['weight'], x['index']))  # sort by weight(primary) and index(secondary) ascending
 
-    print(parsed)
+    distances = [x2['weight'] - x1['weight'] for x1, x2 in zip(data, data[1:])]  # distances between all adjacent elements
+    min_dist_index = distances.index(min(distances))  # index of the first element of the pair with minimal distance
+    first_closest_pair = data[min_dist_index:min_dist_index + 2]  # the first pair of elements with the closest range in data
+    return [[x['weight'], x['index'], x['number']] for x in first_closest_pair]  # [[weight1, index1, number1], [weight2, index2, number2]] of the pair found
 
 
-def closest(strng: str) -> list:
-    if not strng: return []  # test for empty input
+if __name__ == '__main__':
+    import codewars_test as test
 
-    numbers = [*map(int, strng.split())]  # convert to numbers
-    weights = [sum(map(int, item)) for item in strng.split()]  # sum of digits of each number
 
-    closest_range = smallest_total_weight = float("inf")  # looking for minimal distance btw weights and minimal total value of weights themselves, initialize with infinite number
-    for i1 in range(len(weights)):  # compare each item...
-        for i2 in range(i1 + 1, len(weights)):  # with each subsequent items
-            current_range = abs(weights[i1] - weights[i2])  # weights distance
-            current_total_weight = weights[i1] + weights[i2]  # weights sum
-            if (current_range < closest_range) or ((current_range == closest_range) and (current_total_weight < smallest_total_weight)):  # if (weights are closer) or (not farther & smaller) than previous found...
-                closest_range = current_range  # update closest range...
-                smallest_total_weight = current_total_weight  # update smallest weights sum
-                pair = sorted((i1, i2), key=lambda x: weights[x])  # indexes of closest pair found so far, sorted in weight ascending order
+    def _testing(actual, expected):
+        test.assert_equals(actual, expected)
 
-    return [[weights[i], i, numbers[i]] for i in pair]  # [[weight1, number1, index1], [weight2, number2, index2]] of closest pair found
+
+    test.describe("closest")
+    test.it("Basic tests")
+    _testing(closest(""), [])
+    _testing(closest("103 123 4444 99 2000 "), [[2, 4, 2000], [4, 0, 103]])
+    _testing(closest("456899 50 11992 176 272293 163 389128 96 290193 85 52"), [[13, 9, 85], [14, 3, 176]])
+    _testing(closest("239382 162 254765 182 485944 134 468751 62 49780 108 54"), [[8, 5, 134], [8, 7, 62]])
+    _testing(closest("241259 154 155206 194 180502 147 300751 200 406683 37 57"), [[10, 1, 154], [10, 9, 37]])
+    _testing(closest("89998 187 126159 175 338292 89 39962 145 394230 167 1"), [[13, 3, 175], [14, 9, 167]])
+
+    _testing(closest("403749 18 278325 97 304194 119 58359 165 144403 128 38"), [[11, 5, 119], [11, 9, 128]])
+    _testing(closest("28706 196 419018 130 49183 124 421208 174 404307 60 24"), [[6, 9, 60], [6, 10, 24]])
+    _testing(closest("189437 110 263080 175 55764 13 257647 53 486111 27 66"), [[8, 7, 53], [9, 9, 27]])
+    _testing(closest("79257 160 44641 146 386224 147 313622 117 259947 155 58"), [[11, 3, 146], [11, 9, 155]])
+    _testing(closest("315411 165 53195 87 318638 107 416122 121 375312 193 59"), [[15, 0, 315411], [15, 3, 87]])

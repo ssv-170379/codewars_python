@@ -31,3 +31,15 @@ def stack_height_3d(layers):
     else:
         return 1 + ((2 / 3) ** 0.5) * (layers - 1)  # https://mathforums.com/threads/height-of-stack-of-spheres-in-pyramid-fashion.19971/post-82714
         # 1 - bottom layer is = diameter (full height). sqrt(2/3) * layers-1 - all upper layers are of this height
+
+
+if __name__ == '__main__':
+    import codewars_test as test
+
+
+    @test.describe('Example Tests')
+    def example_tests():
+        @test.it('Example Test Cases')
+        def example_test_cases():
+            test.assert_equals(stack_height_3d(1), 1)
+            test.assert_approx_equals(stack_height_3d(2), 1.816, margin=0.001, message=None)
